@@ -1,0 +1,7 @@
+window.KARAMA_CONFIG = {
+  SUPABASE_URL: "https://xdbjiejdfjxlbltfyfho.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_OR4r305McbTXfiFwu2KzLQ_WMG9T6Aq",
+  STORE_WHATSAPP: "201064199914",
+  FREE_SHIPPING_THRESHOLD: 1000,
+  PREPAID_DISCOUNT_RATE: 0.05
+};
