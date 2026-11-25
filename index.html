@@ -1,1 +1,875 @@
-index.html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>كرامه بيوتي | مستحضرات التجميل والعطور الأصلية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Cairo', 'sans-serif'] },
+          colors: {
+            brand: {
+              ivory: '#FAF7F2',
+              blush: '#F4EAE4',
+              gold: '#B8894A',
+              goldDark: '#966D35',
+              ink: '#1C1917',
+              muted: '#6B625B'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background-color: #FAF7F2; color: #1C1917; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-brand-gold selection:text-white">
+
+  <!-- شريط التنبيهات العلوي -->
+  <div class="bg-brand-ink text-brand-ivory text-xs sm:text-sm py-2 px-4 text-center">
+    <span>شحن مجاني للطلبات فوق <strong>1,000 ج.م</strong></span>
+    <span class="mx-2 text-brand-gold">•</span>
+    <span>خصم إضافي <strong>5%</strong> عند الدفع عبر إنستاباي أو المحافظ الإلكترونية</span>
+  </div>
+
+  <!-- الهيدر -->
+  <header class="sticky top-0 z-40 bg-brand-ivory/95 backdrop-blur border-b border-stone-200">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <a href="#" class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-full bg-brand-ink text-brand-gold flex items-center justify-center font-extrabold text-lg border border-brand-gold/40">
+          ك
+        </div>
+        <div>
+          <h1 class="text-lg font-extrabold leading-tight tracking-tight">كرامه بيوتي</h1>
+          <p class="text-[11px] text-brand-muted">تجميل • عناية • عطور أصلية</p>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-stone-700">
+        <a href="#bundles" class="hover:text-brand-gold transition">باقات الروتين</a>
+        <a href="#catalog" class="hover:text-brand-gold transition">المنتجات</a>
+        <button onclick="openAdvisorModal()" class="text-brand-gold hover:text-brand-goldDark transition flex items-center gap-1">
+          <span>✨ المستشار الذكي</span>
+        </button>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openAdvisorModal()" class="md:hidden text-xs font-bold bg-brand-blush text-brand-ink px-3 py-2 rounded-full border border-brand-gold/30">
+          ✨ مستشارك
+        </button>
+        <button onclick="toggleCart(true)" class="relative bg-brand-ink text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 hover:bg-stone-800 transition">
+          <span>السلة</span>
+          <span id="cart-badge" class="bg-brand-gold text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- القسم الترحيبي (Hero) -->
+  <section class="relative overflow-hidden bg-gradient-to-b from-brand-blush/80 to-brand-ivory border-b border-stone-200/70">
+    <div class="max-w-6xl mx-auto px-4 py-12 md:py-16 grid md:grid-cols-2 gap-8 items-center">
+      <div>
+        <span class="inline-block bg-white border border-brand-gold/30 text-brand-goldDark text-xs font-bold px-3 py-1 rounded-full mb-4">
+          أصلي 100% • فحص الكود التسلسلي (Batch Code)
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold leading-snug mb-4">
+          روتينك المتكامل وعطرك المميز… <span class="text-brand-gold">بثقة كاملة</span>
+        </h2>
+        <p class="text-brand-muted text-sm sm:text-base leading-relaxed mb-6">
+          لا تحتاري في الاختيار أونلاين؛ جربي مستشار البشرة والعطور الذكي ليقترح لكِ الأنسب حسب نوع بشرتك وميزانيتك، أو اطلبي مجموعة العينات قبل شراء الزجاجة الكاملة.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <button onclick="openAdvisorModal()" class="bg-brand-gold hover:bg-brand-goldDark text-white font-bold px-6 py-3 rounded-xl text-sm shadow-sm transition">
+            ✨ اختاري منتجك بالمستشار الذكي
+          </button>
+          <a href="#catalog" class="bg-white hover:bg-stone-100 text-brand-ink border border-stone-300 font-bold px-6 py-3 rounded-xl text-sm transition">
+            تصفح الكتالوج
+          </a>
+        </div>
+      </div>
+
+      <!-- بطاقة ثقة ومميزات -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm">
+          <div class="text-2xl mb-2">🛡️</div>
+          <h3 class="font-bold text-sm mb-1">منتجات أصلية 100%</h3>
+          <p class="text-xs text-brand-muted">من الوكلاء والموزعين المعتمدين مع ضمان الاستبدال.</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm">
+          <div class="text-2xl mb-2">🧪</div>
+          <h3 class="font-bold text-sm mb-1">عينات عطور للتجربة</h3>
+          <p class="text-xs text-brand-muted">جرّبي العطر في منزلك وتُخصم قيمتها من الزجاجة الكاملة.</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm">
+          <div class="text-2xl mb-2">📦</div>
+          <h3 class="font-bold text-sm mb-1">شحن لكل المحافظات</h3>
+          <p class="text-xs text-brand-muted">تغليف آمن يحمي الزجاج والمستحضرات من الحرارة والكسر.</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm">
+          <div class="text-2xl mb-2">💬</div>
+          <h3 class="font-bold text-sm mb-1">متابعة عبر واتساب</h3>
+          <p class="text-xs text-brand-muted">تأكيد فوري للطلب واستشارة مجانية لطريقة الاستخدام.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- باقات الروتين والتوفير (لرفع متوسط السلة AOV) -->
+  <section id="bundles" class="max-w-6xl mx-auto px-4 py-10">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-6">
+      <div>
+        <span class="text-xs font-bold text-brand-gold uppercase tracking-wider">وفر حتى 20%</span>
+        <h3 class="text-2xl font-extrabold">باقات الروتين والتجربة الأكثر طلباً</h3>
+      </div>
+      <p class="text-xs text-brand-muted">اشترِ الروتين الكامل بسعر أوفر واحصل على نتائج أسرع</p>
+    </div>
+    <div id="bundles-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </section>
+
+  <!-- الكتالوج والفلاتر -->
+  <section id="catalog" class="max-w-6xl mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <h3 class="text-2xl font-extrabold">كتالوج كرامه بيوتي</h3>
+      <div class="relative w-full md:w-72">
+        <input
+          id="search-input"
+          type="text"
+          oninput="renderProducts()"
+          placeholder="ابحث عن عطر، سيروم، نوع بشرة..."
+          class="w-full bg-white border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-brand-gold"
+        />
+      </div>
+    </div>
+
+    <!-- أزرار التصنيفات -->
+    <div id="category-tabs" class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-6"></div>
+
+    <!-- شبكة المنتجات -->
+    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    <div id="empty-state" class="hidden text-center py-12 bg-white rounded-2xl border border-stone-200">
+      <p class="text-brand-muted font-semibold mb-3">لم نجد منتجات مطابقة لبحثك حالياً.</p>
+      <button onclick="resetFilters()" class="text-sm font-bold text-brand-gold underline">عرض جميع المنتجات</button>
+    </div>
+  </section>
+
+  <!-- الفوتر -->
+  <footer class="bg-brand-ink text-stone-300 mt-12 py-10 px-4">
+    <div class="max-w-6xl mx-auto grid sm:grid-cols-3 gap-6 text-sm">
+      <div>
+        <h4 class="text-white font-extrabold text-base mb-2">كرامه بيوتي</h4>
+        <p class="text-xs text-stone-400 leading-relaxed">
+          متجرك الموثوق لمستحضرات العناية بالبشرة والمكياج والعطور الأصلية في مصر، مع استشارات ذكية وتوصيل سريع حتى باب المنزل.
+        </p>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-2">سياسات الثقة</h4>
+        <ul class="space-y-1.5 text-xs text-stone-400">
+          <li>• معاينة الشحنة قبل الاستلام</li>
+          <li>• استبدال واسترجاع خلال 14 يوماً بحالة المصنع</li>
+          <li>• دفع عند الاستلام أو إلكترونياً بخصم 5%</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-2">تواصل سريع</h4>
+        <p class="text-xs text-stone-400 mb-3">تحتاج مساعدة في اختيار روتين بشرتك أو هدية عطرية؟</p>
+        <button onclick="openDirectWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition">
+          تحدث معنا عبر واتساب
+        </button>
+      </div>
+    </div>
+    <div class="max-w-6xl mx-auto border-t border-stone-800 mt-8 pt-4 text-center text-xs text-stone-500">
+      © 2026 كرامه بيوتي — جميع الحقوق محفوظة
+    </div>
+  </footer>
+
+  <!-- نافذة تفاصيل المنتج (الهرم العطري / تفاصيل العناية) -->
+  <div id="product-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl">
+      <button onclick="closeProductModal()" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center font-bold">✕</button>
+      <div id="product-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- نافذة المستشار الذكي -->
+  <div id="advisor-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl">
+      <button onclick="closeAdvisorModal()" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center font-bold">✕</button>
+      <div class="mb-4">
+        <span class="text-xs font-bold text-brand-gold">✨ مستشار كرامه بيوتي الذكي</span>
+        <h3 class="text-xl font-extrabold mt-1">أجب عن 3 أسئلة لنرشح لك الأنسب</h3>
+      </div>
+
+      <div class="space-y-4 text-sm">
+        <div>
+          <label class="block font-bold mb-1.5">1. ما هدفك الأساسي اليوم؟</label>
+          <select id="adv-goal" onchange="updateAdvisorSubOptions()" class="w-full border border-stone-300 rounded-xl p-2.5 bg-brand-ivory">
+            <option value="عناية بالبشرة">روتين عناية بالبشرة</option>
+            <option value="عطور">اختيار عطر مميز أو عينة</option>
+            <option value="مكياج">مكياج يومي ثابت</option>
+          </select>
+        </div>
+
+        <div>
+          <label id="adv-pref-label" class="block font-bold mb-1.5">2. نوع البشرة / التفضيل:</label>
+          <select id="adv-pref" class="w-full border border-stone-300 rounded-xl p-2.5 bg-brand-ivory"></select>
+        </div>
+
+        <div>
+          <label class="block font-bold mb-1.5">3. الميزانية التقريبية:</label>
+          <select id="adv-budget" class="w-full border border-stone-300 rounded-xl p-2.5 bg-brand-ivory">
+            <option value="500">اقتصادية (حتى 500 ج.م)</option>
+            <option value="1200" selected>متوسطة (حتى 1,200 ج.م)</option>
+            <option value="99999">مفتوحة / هدايا فاخرة</option>
+          </select>
+        </div>
+
+        <button onclick="runAdvisor()" class="w-full bg-brand-ink hover:bg-stone-800 text-white font-bold py-3 rounded-xl transition">
+          اعرض الترشيح المناسب لي
+        </button>
+      </div>
+
+      <div id="advisor-results" class="mt-5 space-y-3 hidden border-t border-stone-200 pt-4"></div>
+    </div>
+  </div>
+
+  <!-- سلة التسوق الجانبية وإتمام الطلب عبر واتساب -->
+  <div id="cart-drawer" class="fixed inset-0 z-50 hidden">
+    <div onclick="toggleCart(false)" class="absolute inset-0 bg-black/50 backdrop-blur-xs"></div>
+    <aside class="absolute top-0 left-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col">
+      <!-- رأس السلة -->
+      <div class="p-4 border-b border-stone-200 flex items-center justify-between">
+        <h3 class="font-extrabold text-lg">سلة المشتريات</h3>
+        <button onclick="toggleCart(false)" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 font-bold">✕</button>
+      </div>
+
+      <!-- شريط الشحن المجاني -->
+      <div class="px-4 py-3 bg-brand-blush/70 border-b border-stone-200">
+        <p id="shipping-bar-text" class="text-xs font-bold text-brand-ink mb-1.5"></p>
+        <div class="w-full h-2 bg-stone-200 rounded-full overflow-hidden">
+          <div id="shipping-bar-fill" class="h-full bg-brand-gold transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- محتوى السلة -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-4">
+        <div id="cart-items" class="space-y-3"></div>
+
+        <!-- عرض Upsell ذكي داخل السلة -->
+        <div id="cart-upsell" class="hidden bg-brand-ivory border border-brand-gold/40 rounded-xl p-3">
+          <p class="text-xs font-extrabold text-brand-goldDark mb-1">💡 أضفها لإكمال طلبك والاستفادة من العرض:</p>
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <p class="text-xs font-bold">عينة عطر فاخر (10 مل)</p>
+              <p class="text-[11px] text-brand-muted">مثالية للتجربة والحقيبة — 140 ج.م</p>
+            </div>
+            <button onclick="addToCart('sample-10ml')" class="bg-brand-ink text-white text-xs font-bold px-3 py-1.5 rounded-lg shrink-0">
+              + أضف
+            </button>
+          </div>
+        </div>
+
+        <!-- بيانات الشحن والدفع -->
+        <form id="checkout-form" onsubmit="submitWhatsAppOrder(event)" class="hidden space-y-3 border-t border-stone-200 pt-4">
+          <h4 class="font-extrabold text-sm">بيانات التوصيل السريع</h4>
+          <input id="cust-name" required type="text" placeholder="الاسم بالكامل" class="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm" />
+          <input id="cust-phone" required type="tel" placeholder="رقم الهاتف / واتساب (مثال: 010xxxxxxxx)" class="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm" />
+          <select id="cust-gov" onchange="renderCart()" class="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm bg-white">
+            <option value="القاهرة والجيزة|60">القاهرة والجيزة (شحن 60 ج.م)</option>
+            <option value="الإسكندرية والدلتا|75">الإسكندرية والدلتا (شحن 75 ج.م)</option>
+            <option value="الصعيد ومدن القناة|90">الصعيد ومدن القناة (شحن 90 ج.م)</option>
+          </select>
+          <input id="cust-address" required type="text" placeholder="العنوان التفصيلي (الشارع / العمارة / علامة مميزة)" class="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm" />
+
+          <div class="bg-brand-ivory p-3 rounded-xl border border-stone-200 space-y-2 text-xs">
+            <p class="font-bold text-brand-ink">طريقة الدفع:</p>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="payment" value="cod" checked onchange="renderCart()" />
+              <span>الدفع عند الاستلام (كاش)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer text-emerald-800 font-bold">
+              <input type="radio" name="payment" value="prepaid" onchange="renderCart()" />
+              <span>إنستاباي / محفظة إلكترونية (وفر 5% خصم فوري)</span>
+            </label>
+          </div>
+
+          <!-- ملخص الحساب -->
+          <div class="bg-stone-50 rounded-xl p-3 text-xs space-y-1.5 border border-stone-200">
+            <div class="flex justify-between"><span>المجموع الفرعي:</span><strong id="sum-subtotal">0 ج.م</strong></div>
+            <div id="sum-discount-row" class="hidden flex justify-between text-emerald-700"><span>خصم الدفع الإلكتروني (5%):</span><strong id="sum-discount">0 ج.م</strong></div>
+            <div class="flex justify-between"><span>مصاريف الشحن:</span><strong id="sum-shipping">0 ج.م</strong></div>
+            <div class="flex justify-between text-sm font-extrabold border-t border-stone-200 pt-2">
+              <span>الإجمالي المطلوب:</span><span id="sum-total" class="text-brand-goldDark">0 ج.م</span>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl text-sm shadow-sm transition">
+            تأكيد وإرسال الطلب عبر واتساب 💬
+          </button>
+        </form>
+      </div>
+    </aside>
+  </div>
+
+  <!-- إشعار إضافة للسلة -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-brand-ink text-white text-xs font-bold px-4 py-3 rounded-xl shadow-lg opacity-0 pointer-events-none transition-opacity duration-300"></div>
+
+  <script>
+    // =========================================================================
+    // إعدادات المتجر (عدّل رقم واتساب متجرك هنا بصيغة دولية بدون +)
+    // =========================================================================
+    const STORE_WHATSAPP = "201064199914";
+    const FREE_SHIPPING_THRESHOLD = 1000;
+    const PREPAID_DISCOUNT_RATE = 0.05;
+
+    // =========================================================================
+    // كتالوج المنتجات (متوافق مع عمود New Price ويمكن ربطه لاحقاً بـ Supabase)
+    // =========================================================================
+    const PRODUCTS = [
+      {
+        id: "bundle-glow",
+        name: "باقة النضارة والحماية المتكاملة (3 قطع)",
+        category: "باقات التوفير",
+        isBundle: true,
+        oldPrice: 1450,
+        newPrice: 1180,
+        badge: "وفر 270 ج.م",
+        tags: ["جميع البشرات", "نضارة", "روتين يومي"],
+        shortDesc: "غسول لطيف + سيروم فيتامين سي 10% + واقي شمس خفيف SPF 50+.",
+        icon: "bundle",
+        color: "from-amber-100 to-orange-50",
+        details: {
+          routine: ["الخطوة 1: غسول متوازن صباحاً ومساءً.", "الخطوة 2: 3 قطرات من سيروم فيتامين سي صباحاً.", "الخطوة 3: واقي الشمس قبل الخروج بـ 15 دقيقة."],
+          authenticity: "مختومة بباركود الوكيل الأصلي وتاريخ صلاحية حديث."
+        }
+      },
+      {
+        id: "bundle-discovery",
+        name: "مجموعة اكتشاف العطور الفاخرة (5 عينات × 5 مل)",
+        category: "باقات التوفير",
+        isBundle: true,
+        oldPrice: 550,
+        newPrice: 450,
+        badge: "قسيمة خصم 450 ج.م",
+        tags: ["عطور", "شرقي", "زهري", "فريش", "تجرية"],
+        shortDesc: "جربي 5 عطور أصلية الأكثر مبيعاً، واحصلي على قسيمة بـ 450 ج.م عند شراء الزجاجة الكاملة.",
+        icon: "perfume",
+        color: "from-rose-100 to-amber-50",
+        details: {
+          notes: { top: "برغموت، ياسمين، كمثرى", heart: "ورد دمشقي، عود ناعم، فانيليا", base: "عنبر، مسك أبيض، خشب الصندل" },
+          occasion: "مناسبة لاختيار عطرك الصيفي والمسائي قبل قرار الشراء."
+        }
+      },
+      {
+        id: "bundle-oily",
+        name: "باقة توازن البشرة الدهنية والمختلطة",
+        category: "باقات التوفير",
+        isBundle: true,
+        oldPrice: 1120,
+        newPrice: 920,
+        badge: "الأكثر مبيعاً",
+        tags: ["دهنية", "مختلطة", "مسام"],
+        shortDesc: "غسول ساليسيليك + سيروم نياسيناميد + مرطب جيل خالي من الزيوت.",
+        icon: "bundle",
+        color: "from-emerald-50 to-teal-50",
+        details: {
+          routine: ["تقليل اللمعان والتحكم في إفراز الدهون خلال 14 يوماً.", "قوام خفيف لا يسد المسام (Non-comedogenic)."],
+          authenticity: "أصلي 100% ومناسب للاستخدام اليومي."
+        }
+      },
+      {
+        id: "perf-velvet-oud",
+        name: "عطر فيلفيت عود آند فانيلا — 100 مل (EDP)",
+        category: "عطور",
+        isBundle: false,
+        oldPrice: 1650,
+        newPrice: 1390,
+        badge: "ثبات 10+ ساعات",
+        tags: ["شرقي", "مسائي", "شتوي", "فخم"],
+        shortDesc: "توليفة دافئة تجمع نعومة الفانيليا المدغشقرية مع لمسة عود وعنبر راقية.",
+        icon: "perfume",
+        color: "from-stone-200 to-amber-100",
+        details: {
+          notes: { top: "زعفران، برغموت إيطالي", heart: "عود ناعم، ورد تركي، برالين", base: "فانيليا، عنبر دافئ، خشب الأرز" },
+          occasion: "مثالي للمناسبات المسائية والخروجات الرسمية."
+        }
+      },
+      {
+        id: "perf-bloom-mist",
+        name: "عطر بلوم سيلك الزهري — 75 مل (EDP)",
+        category: "عطور",
+        isBundle: false,
+        oldPrice: 1100,
+        newPrice: 950,
+        badge: "نهاري منعش",
+        tags: ["زهري", "فريش", "نهاري", "صيفي"],
+        shortDesc: "عطر أنثوي ناعم برائحة الياسمين والكمثرى والمسك الأبيض للعمل والجامعة.",
+        icon: "perfume",
+        color: "from-pink-100 to-rose-50",
+        details: {
+          notes: { top: "كمثرى، يوسفي، فلفل وردي", heart: "ياسمين سامباك، زهر البرتقال", base: "مسك أبيض، كشمير، فانيليا خفيفة" },
+          occasion: "مناسب جداً للاستخدام اليومي والجو الحار."
+        }
+      },
+      {
+        id: "skin-hyaluronic",
+        name: "سيروم الهيالورونيك أسيد + B5 للترطيب العميق",
+        category: "عناية بالبشرة",
+        isBundle: false,
+        oldPrice: 520,
+        newPrice: 440,
+        badge: "ترطيب فوري",
+        tags: ["جافة", "حساسة", "مختلطة", "جميع البشرات"],
+        shortDesc: "يرطب البشرة بعمق ويقلل الخطوط الرفيعة بتركيبة خفيفة وسريعة الامتصاص.",
+        icon: "serum",
+        color: "from-sky-100 to-indigo-50",
+        details: {
+          routine: ["يُوضع على بشرة رطبة قليلاً صباحاً ومساءً قبل المرطب.", "خالٍ من العطور والبارابين."],
+          authenticity: "منتج أصلي مضمون بدرجة نقاء عالية."
+        }
+      },
+      {
+        id: "skin-sunscreen",
+        name: "واقي شمس فلويد غير مرئي SPF 50+",
+        category: "عناية بالبشرة",
+        isBundle: false,
+        oldPrice: 680,
+        newPrice: 590,
+        badge: "بدون أثر أبيض",
+        tags: ["دهنية", "مختلطة", "جافة", "جميع البشرات"],
+        shortDesc: "حماية عالية ضد أشعة UVA/UVB بقوام مائي سريع الامتصاص يناسب المكياج.",
+        icon: "cream",
+        color: "from-yellow-100 to-amber-50",
+        details: {
+          routine: ["يُجدد كل ساعتين إلى ثلاث ساعات عند التعرض المباشر للشمس.", "مقاوم للتعرق ولا يسبب لمعاناً."],
+          authenticity: "ختم الوكيل الرسمي."
+        }
+      },
+      {
+        id: "makeup-liptint",
+        name: "تينت شفاه وخدود فيلفيت ثابت 12 ساعة",
+        category: "مكياج",
+        isBundle: false,
+        oldPrice: 320,
+        newPrice: 265,
+        badge: "الأكثر طلباً",
+        tags: ["مكياج يومي", "ثابت", "طبيعي"],
+        shortDesc: "لون غني وقابل للبناء لا يسبب جفاف الشفاه، مناسب للإطلالة اليومية الطبيعية.",
+        icon: "makeup",
+        color: "from-rose-200 to-pink-100",
+        details: {
+          routine: ["غني بفيتامين E وزيت الجوجوبا للحفاظ على نعومة الشفاه."],
+          authenticity: "أصلي 100% ومغلف حرارياً."
+        }
+      },
+      {
+        id: "sample-10ml",
+        name: "عينة عطر فاخر للتجربة (10 مل)",
+        category: "عطور",
+        isBundle: false,
+        oldPrice: 180,
+        newPrice: 140,
+        badge: "حجم الحقيبة",
+        tags: ["فريش", "شرقي", "زهري", "تجربة"],
+        shortDesc: "زجاجة بخاخ أنيقة سعة 10 مل تكفي أكثر من 120 رشة لتجربة الثبات والفوحان.",
+        icon: "perfume",
+        color: "from-amber-100 to-stone-100",
+        details: {
+          notes: { top: "تختار العطر المفضل في ملاحظات واتساب", heart: "تعبئة معقمة من الزجاجة الأصلية", base: "مثالية للسفر والحقيبة" },
+          occasion: "طريقة ذكية لتجربة العطر قبل شراء الزجاجة الكبيرة."
+        }
+      }
+    ];
+
+    const CATEGORIES = ["الكل", "باقات التوفير", "عطور", "عناية بالبشرة", "مكياج"];
+    let activeCategory = "الكل";
+    let cart = JSON.parse(localStorage.getItem("karama_cart_v1") || "[]");
+
+    // رسومات SVG أنيقة للمنتجات (تعمل بدون أي صور خارجية معطلة)
+    function getProductIllustration(type) {
+      const svgs = {
+        perfume: `<svg class="w-16 h-16 text-brand-ink/80" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><rect x="24" y="8" width="16" height="8" rx="2"/><path d="M28 16v6h8v-6"/><rect x="16" y="22" width="32" height="34" rx="6" fill="white" fill-opacity="0.65"/><rect x="22" y="32" width="20" height="14" rx="2" stroke="#B8894A"/></svg>`,
+        serum: `<svg class="w-16 h-16 text-brand-ink/80" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M29 8h6v8h-6z"/><rect x="24" y="16" width="16" height="6" rx="1"/><path d="M22 22h20l3 8v24a4 4 0 0 1-4 4H23a4 4 0 0 1-4-4V30l3-8z" fill="white" fill-opacity="0.65"/><path d="M26 36h12M26 42h8" stroke="#B8894A"/></svg>`,
+        cream: `<svg class="w-16 h-16 text-brand-ink/80" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><rect x="14" y="20" width="36" height="8" rx="3"/><rect x="16" y="28" width="32" height="24" rx="6" fill="white" fill-opacity="0.65"/><circle cx="32" cy="40" r="5" stroke="#B8894A"/></svg>`,
+        makeup: `<svg class="w-16 h-16 text-brand-ink/80" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M26 24V12l12 6v6" fill="#E11D48" fill-opacity="0.25"/><rect x="24" y="24" width="16" height="10"/><rect x="22" y="34" width="20" height="22" rx="3" fill="white" fill-opacity="0.65"/></svg>`,
+        bundle: `<svg class="w-16 h-16 text-brand-ink/80" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><rect x="12" y="24" width="40" height="30" rx="4" fill="white" fill-opacity="0.65"/><path d="M10 24h44v-8H10z"/><path d="M32 16v38" stroke="#B8894A"/><path d="M32 16c-6 0-10-4-8-7s8 1 8 7zm0 0c6 0 10-4 8-7s-8 1-8 7z" stroke="#B8894A"/></svg>`
+      };
+      return svgs[type] || svgs.serum;
+    }
+
+    function formatEGP(num) {
+      return Number(num).toLocaleString("ar-EG") + " ج.م";
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.remove("opacity-0");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.add("opacity-0"), 2400);
+    }
+
+    function renderCategoryTabs() {
+      const container = document.getElementById("category-tabs");
+      container.innerHTML = CATEGORIES.map(cat => `
+        <button
+          onclick="setCategory('${cat}')"
+          class="px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition ${
+            activeCategory === cat
+              ? 'bg-brand-ink text-white shadow-sm'
+              : 'bg-white text-stone-700 border border-stone-200 hover:border-brand-gold'
+          }">
+          ${cat}
+        </button>
+      `).join("");
+    }
+
+    function setCategory(cat) {
+      activeCategory = cat;
+      renderCategoryTabs();
+      renderProducts();
+    }
+
+    function resetFilters() {
+      activeCategory = "الكل";
+      document.getElementById("search-input").value = "";
+      renderCategoryTabs();
+      renderProducts();
+    }
+
+    function productCardHTML(p) {
+      const saving = p.oldPrice > p.newPrice ? Math.round(((p.oldPrice - p.newPrice) / p.oldPrice) * 100) : 0;
+      return `
+        <article class="bg-white rounded-2xl border border-stone-200/80 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col">
+          <div onclick="openProductModal('${p.id}')" class="cursor-pointer relative h-44 bg-gradient-to-br ${p.color} flex items-center justify-center p-4">
+            <span class="absolute top-3 right-3 bg-brand-ink/90 text-white text-[11px] font-bold px-2.5 py-1 rounded-full">${p.badge}</span>
+            ${saving > 0 ? `<span class="absolute top-3 left-3 bg-white/90 text-rose-700 text-[11px] font-extrabold px-2 py-1 rounded-full">-${saving}%</span>` : ""}
+            ${getProductIllustration(p.icon)}
+          </div>
+          <div class="p-4 flex-1 flex flex-col">
+            <span class="text-[11px] font-bold text-brand-gold mb-1">${p.category}</span>
+            <h4 onclick="openProductModal('${p.id}')" class="cursor-pointer font-extrabold text-sm sm:text-base leading-snug mb-1.5 hover:text-brand-gold transition">${p.name}</h4>
+            <p class="text-xs text-brand-muted leading-relaxed mb-3 flex-1">${p.shortDesc}</p>
+            <div class="flex items-center justify-between gap-2 pt-3 border-t border-stone-100">
+              <div>
+                <span class="font-extrabold text-base text-brand-ink">${formatEGP(p.newPrice)}</span>
+                ${p.oldPrice > p.newPrice ? `<span class="block text-[11px] text-stone-400 line-through">${formatEGP(p.oldPrice)}</span>` : ""}
+              </div>
+              <div class="flex gap-1.5">
+                <button onclick="openProductModal('${p.id}')" class="px-3 py-2 rounded-xl border border-stone-200 text-xs font-bold hover:bg-stone-100">التفاصيل</button>
+                <button onclick="addToCart('${p.id}')" class="px-3.5 py-2 rounded-xl bg-brand-ink hover:bg-brand-gold text-white text-xs font-bold transition">+ للسلة</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderBundles() {
+      const bundles = PRODUCTS.filter(p => p.isBundle);
+      document.getElementById("bundles-grid").innerHTML = bundles.map(productCardHTML).join("");
+    }
+
+    function renderProducts() {
+      const q = document.getElementById("search-input").value.trim().toLowerCase();
+      const filtered = PRODUCTS.filter(p => {
+        const matchCat = activeCategory === "الكل" || p.category === activeCategory;
+        const matchQ = !q || p.name.toLowerCase().includes(q) || p.shortDesc.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q));
+        return matchCat && matchQ;
+      });
+      const grid = document.getElementById("products-grid");
+      const empty = document.getElementById("empty-state");
+      if (!filtered.length) {
+        grid.innerHTML = "";
+        empty.classList.remove("hidden");
+      } else {
+        empty.classList.add("hidden");
+        grid.innerHTML = filtered.map(productCardHTML).join("");
+      }
+    }
+
+    // نافذة تفاصيل المنتج والهرم العطري
+    function openProductModal(id) {
+      const p = PRODUCTS.find(x => x.id === id);
+      if (!p) return;
+      let extraHTML = "";
+      if (p.details.notes) {
+        extraHTML = `
+          <div class="bg-brand-ivory rounded-xl p-4 border border-brand-gold/30 space-y-2 text-xs">
+            <p class="font-extrabold text-brand-goldDark text-sm">🌸 الهرم العطري</p>
+            <p><strong>الافتتاحية:</strong> ${p.details.notes.top}</p>
+            <p><strong>قلب العطر:</strong> ${p.details.notes.heart}</p>
+            <p><strong>القاعدة:</strong> ${p.details.notes.base}</p>
+            <p class="pt-1 text-brand-muted"><strong>مناسبة الاستخدام:</strong> ${p.details.occasion}</p>
+          </div>
+        `;
+      } else if (p.details.routine) {
+        extraHTML = `
+          <div class="bg-brand-ivory rounded-xl p-4 border border-stone-200 space-y-1.5 text-xs">
+            <p class="font-extrabold text-brand-ink text-sm">✨ طريقة الاستخدام والمميزات</p>
+            ${p.details.routine.map(step => `<p>• ${step}</p>`).join("")}
+            <p class="pt-1 text-emerald-700 font-bold">🛡️ ${p.details.authenticity}</p>
+          </div>
+        `;
+      }
+
+      document.getElementById("product-modal-body").innerHTML = `
+        <div class="h-36 rounded-xl bg-gradient-to-br ${p.color} flex items-center justify-center mb-4">
+          ${getProductIllustration(p.icon)}
+        </div>
+        <span class="text-xs font-bold text-brand-gold">${p.category}</span>
+        <h3 class="text-xl font-extrabold mt-1 mb-2">${p.name}</h3>
+        <p class="text-sm text-brand-muted mb-4 leading-relaxed">${p.shortDesc}</p>
+        ${extraHTML}
+        <div class="flex items-center justify-between mt-5 pt-4 border-t border-stone-200">
+          <div>
+            <span class="text-xl font-extrabold">${formatEGP(p.newPrice)}</span>
+            ${p.oldPrice > p.newPrice ? `<span class="text-xs text-stone-400 line-through mr-2">${formatEGP(p.oldPrice)}</span>` : ""}
+          </div>
+          <button onclick="addToCart('${p.id}'); closeProductModal(); toggleCart(true);" class="bg-brand-ink hover:bg-brand-gold text-white font-bold px-5 py-2.5 rounded-xl text-sm transition">
+            أضف للسلة الآن
+          </button>
+        </div>
+      `;
+      document.getElementById("product-modal").classList.remove("hidden");
+    }
+
+    function closeProductModal() {
+      document.getElementById("product-modal").classList.add("hidden");
+    }
+
+    // المستشار الذكي
+    function openAdvisorModal() {
+      updateAdvisorSubOptions();
+      document.getElementById("advisor-results").classList.add("hidden");
+      document.getElementById("advisor-modal").classList.remove("hidden");
+    }
+    function closeAdvisorModal() {
+      document.getElementById("advisor-modal").classList.add("hidden");
+    }
+
+    function updateAdvisorSubOptions() {
+      const goal = document.getElementById("adv-goal").value;
+      const pref = document.getElementById("adv-pref");
+      const label = document.getElementById("adv-pref-label");
+      if (goal === "عطور") {
+        label.textContent = "2. ما الذوق العطري المفضل لك؟";
+        pref.innerHTML = `
+          <option value="شرقي">دافئ / عود وفانيليا (مسائي)</option>
+          <option value="زهري">زهري ناعم ومنعش (نهاري)</option>
+          <option value="تجربة">أريد التجربة بعينات أولاً</option>
+        `;
+      } else if (goal === "عناية بالبشرة") {
+        label.textContent = "2. ما نوع بشرتك؟";
+        pref.innerHTML = `
+          <option value="دهنية">دهنية / مختلطة (مسام ولمعان)</option>
+          <option value="جافة">جافة / تحتاج ترطيباً عميقاً</option>
+          <option value="نضارة">عادية / أريد نضارة وحماية من الشمس</option>
+        `;
+      } else {
+        label.textContent = "2. نوع الإطلالة المطلوبة:";
+        pref.innerHTML = `<option value="مكياج يومي">إطلالة يومية طبيعية وثابتة</option>`;
+      }
+    }
+
+    function runAdvisor() {
+      const goal = document.getElementById("adv-goal").value;
+      const pref = document.getElementById("adv-pref").value;
+      const maxBudget = Number(document.getElementById("adv-budget").value);
+
+      let matches = PRODUCTS.filter(p =>
+        (p.category === goal || p.isBundle) &&
+        p.newPrice <= maxBudget &&
+        p.tags.some(t => t.includes(pref) || pref.includes(t))
+      );
+
+      if (!matches.length) {
+        matches = PRODUCTS.filter(p => p.category === goal && p.newPrice <= maxBudget);
+      }
+      if (!matches.length) {
+        matches = PRODUCTS.filter(p => p.newPrice <= maxBudget).slice(0, 2);
+      }
+
+      const resEl = document.getElementById("advisor-results");
+      resEl.classList.remove("hidden");
+      resEl.innerHTML = `
+        <p class="text-xs font-extrabold text-brand-goldDark">✨ أفضل ترشيحاتنا لك بناءً على اختياراتك:</p>
+        ${matches.slice(0, 2).map(p => `
+          <div class="flex items-center justify-between gap-3 bg-brand-ivory p-3 rounded-xl border border-stone-200">
+            <div>
+              <p class="font-bold text-xs sm:text-sm">${p.name}</p>
+              <p class="text-[11px] text-brand-muted">${formatEGP(p.newPrice)} — ${p.badge}</p>
+            </div>
+            <button onclick="addToCart('${p.id}'); closeAdvisorModal(); toggleCart(true);" class="bg-brand-ink text-white text-xs font-bold px-3 py-2 rounded-lg shrink-0">
+              أضف للسلة
+            </button>
+          </div>
+        `).join("")}
+      `;
+    }
+
+    // إدارة السلة
+    function saveCart() {
+      localStorage.setItem("karama_cart_v1", JSON.stringify(cart));
+    }
+
+    function addToCart(id) {
+      const item = cart.find(i => i.id === id);
+      if (item) item.qty += 1;
+      else cart.push({ id, qty: 1 });
+      saveCart();
+      renderCart();
+      showToast("تمت إضافة المنتج إلى السلة ✓");
+    }
+
+    function updateQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+      saveCart();
+      renderCart();
+    }
+
+    function toggleCart(open) {
+      const drawer = document.getElementById("cart-drawer");
+      if (open) {
+        renderCart();
+        drawer.classList.remove("hidden");
+      } else {
+        drawer.classList.add("hidden");
+      }
+    }
+
+    function renderCart() {
+      const totalQty = cart.reduce((s, i) => s + i.qty, 0);
+      document.getElementById("cart-badge").textContent = totalQty;
+
+      const listEl = document.getElementById("cart-items");
+      const formEl = document.getElementById("checkout-form");
+      const upsellEl = document.getElementById("cart-upsell");
+
+      if (!cart.length) {
+        listEl.innerHTML = `<div class="text-center py-10 text-sm text-brand-muted">سلتك فارغة حالياً — أضف منتجاً أو باقة لتبدأ الطلب.</div>`;
+        formEl.classList.add("hidden");
+        upsellEl.classList.add("hidden");
+        updateShippingBar(0);
+        return;
+      }
+
+      let subtotal = 0;
+      listEl.innerHTML = cart.map(entry => {
+        const p = PRODUCTS.find(x => x.id === entry.id);
+        if (!p) return "";
+        subtotal += p.newPrice * entry.qty;
+        return `
+          <div class="flex items-center justify-between gap-3 bg-stone-50 p-3 rounded-xl border border-stone-200">
+            <div class="min-w-0">
+              <p class="font-bold text-xs sm:text-sm truncate">${p.name}</p>
+              <p class="text-xs text-brand-goldDark font-bold mt-0.5">${formatEGP(p.newPrice)}</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="updateQty('${p.id}', -1)" class="w-7 h-7 rounded-lg bg-white border border-stone-300 font-bold">-</button>
+              <span class="text-xs font-extrabold w-4 text-center">${entry.qty}</span>
+              <button onclick="updateQty('${p.id}', 1)" class="w-7 h-7 rounded-lg bg-white border border-stone-300 font-bold">+</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      formEl.classList.remove("hidden");
+      const hasSample = cart.some(i => i.id === "sample-10ml");
+      upsellEl.classList.toggle("hidden", hasSample);
+
+      updateShippingBar(subtotal);
+
+      const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || "cod";
+      const discount = paymentMethod === "prepaid" ? Math.round(subtotal * PREPAID_DISCOUNT_RATE) : 0;
+      const govVal = document.getElementById("cust-gov").value.split("|");
+      const baseShipping = Number(govVal[1] || 60);
+      const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : baseShipping;
+      const total = subtotal - discount + shipping;
+
+      document.getElementById("sum-subtotal").textContent = formatEGP(subtotal);
+      document.getElementById("sum-discount-row").classList.toggle("hidden", discount === 0);
+      document.getElementById("sum-discount").textContent = "- " + formatEGP(discount);
+      document.getElementById("sum-shipping").textContent = shipping === 0 ? "مجاني 🎉" : formatEGP(shipping);
+      document.getElementById("sum-total").textContent = formatEGP(total);
+    }
+
+    function updateShippingBar(subtotal) {
+      const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+      const pct = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
+      document.getElementById("shipping-bar-fill").style.width = pct + "%";
+      document.getElementById("shipping-bar-text").textContent = remaining === 0
+        ? "🎉 مبروك! حصلت على شحن مجاني لطلبك"
+        : `أضف منتجات بقيمة ${formatEGP(remaining)} للحصول على شحن مجاني`;
+    }
+
+    function submitWhatsAppOrder(e) {
+      e.preventDefault();
+      if (!cart.length) return;
+
+      const name = document.getElementById("cust-name").value.trim();
+      const phone = document.getElementById("cust-phone").value.trim();
+      const govParts = document.getElementById("cust-gov").value.split("|");
+      const govName = govParts[0];
+      const baseShipping = Number(govParts[1]);
+      const address = document.getElementById("cust-address").value.trim();
+      const payment = document.querySelector('input[name="payment"]:checked').value;
+
+      let subtotal = 0;
+      const lines = cart.map(entry => {
+        const p = PRODUCTS.find(x => x.id === entry.id);
+        subtotal += p.newPrice * entry.qty;
+        return `- ${p.name} (الكمية: ${entry.qty}) = ${p.newPrice * entry.qty} ج.م`;
+      });
+
+      const discount = payment === "prepaid" ? Math.round(subtotal * PREPAID_DISCOUNT_RATE) : 0;
+      const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : baseShipping;
+      const total = subtotal - discount + shipping;
+
+      const msg = [
+        "🛍️ *طلب جديد — متجر كرامه بيوتي*",
+        "----------------------------",
+        `👤 الاسم: ${name}`,
+        `📱 الهاتف: ${phone}`,
+        `📍 المحافظة: ${govName}`,
+        `🏠 العنوان: ${address}`,
+        `💳 الدفع: ${payment === "prepaid" ? "إنستاباي / محفظة إلكترونية (خصم 5%)" : "الدفع عند الاستلام"}`,
+        "----------------------------",
+        "*المنتجات:*",
+        ...lines,
+        "----------------------------",
+        `المجموع الفرعي: ${subtotal} ج.م`,
+        discount > 0 ? `خصم الدفع الإلكتروني: -${discount} ج.م` : null,
+        `الشحن: ${shipping === 0 ? "مجاني" : shipping + " ج.م"}`,
+        `*الإجمالي النهائي: ${total} ج.م*`
+      ].filter(Boolean).join("\n");
+
+      window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank");
+    }
+
+    function openDirectWhatsApp() {
+      const msg = "مرحباً كرامه بيوتي، أحتاج مساعدة في اختيار منتجات مناسبة لي.";
+      window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank");
+    }
+
+    // تشغيل المتجر عند التحميل
+    renderCategoryTabs();
+    renderBundles();
+    renderProducts();
+    renderCart();
+  </script>
+</body>
+</html>
