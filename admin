@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>استيراد المنتجات من Excel | كرامه بيوتي</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="./config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Cairo', sans-serif; background: #FAF7F2; color: #1C1917; }
+  </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+  <div class="max-w-5xl mx-auto space-y-6">
+
+    <!-- الهيدر -->
+    <header class="bg-white rounded-2xl border border-stone-200 p-5 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-extrabold">لوحة استيراد Excel — كرامه بيوتي</h1>
+        <p class="text-xs text-stone-500 mt-1">مزامنة تلقائية للأسعار والمخزون مع Supabase اعتماداً على عمود <strong>New Price</strong></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="downloadTemplate()" class="text-xs font-bold px-3.5 py-2 rounded-xl border border-stone-300 hover:bg-stone-100">
+          ⬇ تحميل شيت نموذجي (.xlsx)
+        </button>
+        <a href="./index.html" class="text-xs font-bold px-3.5 py-2 rounded-xl bg-stone-900 text-white hover:bg-stone-800">
+          معاينة المتجر
+        </a>
+        <button id="logout-btn" onclick="handleLogout()" class="hidden text-xs font-bold px-3 py-2 rounded-xl bg-rose-50 text-rose-700 border border-rose-200">
+          خروج
+        </button>
+      </div>
+    </header>
+
+    <!-- تنبيه الإعداد -->
+    <div id="config-warning" class="hidden bg-amber-50 border border-amber-300 text-amber-900 rounded-2xl p-4 text-sm">
+      يرجى تحديث <code>SUPABASE_URL</code> و <code>SUPABASE_ANON_KEY</code> داخل ملف <code>config.js</code> أولاً.
+    </div>
+
+    <!-- بطاقة تسجيل دخول الإدارة -->
+    <section id="auth-section" class="bg-white rounded-2xl border border-stone-200 p-6 max-w-md mx-auto">
+      <h2 class="text-lg font-extrabold mb-1">تسجيل دخول الإدارة</h2>
+      <p class="text-xs text-stone-500 mb-4">استخدم حساب المشرف الذي أنشأته في Supabase Authentication</p>
+      <form onsubmit="handleLogin(event)" class="space-y-3">
+        <input id="admin-email" type="email" required placeholder="البريد الإلكتروني" class="w-full border border-stone-300 rounded-xl px-3.5 py-2.5 text-sm" />
+        <input id="admin-password" type="password" required placeholder="كلمة المرور" class="w-full border border-stone-300 rounded-xl px-3.5 py-2.5 text-sm" />
+        <button type="submit" class="w-full bg-stone-900 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
+          دخول
+        </button>
+        <p id="auth-error" class="text-xs text-rose-600 font-bold hidden"></p>
+      </form>
+    </section>
+
+    <!-- منطقة الاستيراد (تظهر بعد تسجيل الدخول) -->
+    <section id="importer-section" class="hidden space-y-6">
+      <!-- رفع الملف -->
+      <div class="bg-white rounded-2xl border-2 border-dashed border-amber-600/40 p-8 text-center">
+        <input id="excel-file" type="file" accept=".xlsx,.xls,.csv" onchange="handleFileSelect(event)" class="hidden" />
+        <p class="text-base font-extrabold mb-1">ارفع شيت المنتجات (Excel أو CSV)</p>
+        <p class="text-xs text-stone-500 mb-4">يتم قراءة عمود <strong>New Price</strong> تلقائياً مع إمكانية تعديل ربط الأعمدة قبل الحفظ</p>
+        <button onclick="document.getElementById('excel-file').click()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold px-6 py-2.5 rounded-xl text-sm">
+          اختر ملف Excel
+        </button>
+        <p id="file-info" class="text-xs text-stone-600 font-bold mt-3"></p>
+      </div>
+
+      <!-- ربط الأعمدة -->
+      <div id="mapping-card" class="hidden bg-white rounded-2xl border border-stone-200 p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="font-extrabold text-base">1. مطابقة أعمدة شيت Excel</h3>
+          <span class="text-xs bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full font-bold">
+            تم التعرف التلقائي على الأعمدة
+          </span>
+        </div>
+
+        <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div>
+            <label class="block font-bold mb-1">اسم المنتج (مطلوب) *</label>
+            <select id="map-name" onchange="rebuildPreview()" class="w-full border border-stone-300 rounded-lg p-2 bg-stone-50"></select>
+          </div>
+          <div>
+            <label class="block font-bold mb-1 text-amber-800">سعر البيع New Price (مطلوب) *</label>
+            <select id="map-new-price" onchange="rebuildPreview()" class="w-full border-2 border-amber-500 rounded-lg p-2 bg-amber-50 font-bold"></select>
+          </div>
+          <div>
+            <label class="block font-bold mb-1">الكود / SKU (لمنع التكرار)</label>
+            <select id="map-sku" onchange="rebuildPreview()" class="w-full border border-stone-300 rounded-lg p-2 bg-stone-50"></select>
+          </div>
+          <div>
+            <label class="block font-bold mb-1">التصنيف (Category)</label>
+            <select id="map-category" onchange="rebuildPreview()" class="w-full border border-stone-300 rounded-lg p-2 bg-stone-50"></select>
+          </div>
+          <div>
+            <label class="block font-bold mb-1">السعر القديم (Old Price)</label>
+            <select id="map-old-price" onchange="rebuildPreview()" class="w-full border border-stone-300 rounded-lg p-2 bg-stone-50"></select>
+          </div>
+          <div>
+            <label class="block font-bold mb-1">المخزون (Stock)</label>
+            <select id="map-stock" onchange="rebuildPreview()" class="w-full border border-stone-300 rounded-lg p-2 bg-stone-50"></select>
+          </div>
+          <div>
+            <label class="block font-bold mb-1">الوصف المختصر</label>
+            <select id="map-desc" onchange="rebuildPreview()" class="w-full border border-stone-300 rounded-lg p-2 bg-stone-50"></select>
+          </div>
+          <div>
+            <label class="block font-bold mb-1">رابط الصورة (Image URL)</label>
+            <select id="map-image" onchange="rebuildPreview()" class="w-full border border-stone-300 rounded-lg p-2 bg-stone-50"></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- المعاينة وزر الرفع -->
+      <div id="preview-card" class="hidden bg-white rounded-2xl border border-stone-200 p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="font-extrabold text-base">2. معاينة البيانات الجاهزة للرفع</h3>
+            <p id="preview-stats" class="text-xs text-stone-500 mt-0.5"></p>
+          </div>
+          <button id="upload-btn" onclick="uploadToSupabase()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-6 py-2.5 rounded-xl text-sm transition">
+            🚀 رفع ومزامنة مع Supabase
+          </button>
+        </div>
+
+        <!-- شريط التقدم -->
+        <div id="progress-wrap" class="hidden space-y-1.5">
+          <div class="w-full h-2.5 bg-stone-200 rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-emerald-600 transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <p id="progress-text" class="text-xs font-bold text-stone-700"></p>
+        </div>
+
+        <div class="overflow-x-auto border border-stone-200 rounded-xl">
+          <table class="w-full text-xs text-right">
+            <thead class="bg-stone-100 font-bold">
+              <tr>
+                <th class="p-2.5">SKU</th>
+                <th class="p-2.5">المنتج</th>
+                <th class="p-2.5">التصنيف</th>
+                <th class="p-2.5">السعر القديم</th>
+                <th class="p-2.5 text-amber-800">New Price</th>
+                <th class="p-2.5">المخزون</th>
+              </tr>
+            </thead>
+            <tbody id="preview-tbody" class="divide-y divide-stone-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const cfg = window.KARAMA_CONFIG || {};
+    const isConfigured = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes("YOUR-PROJECT-ID");
+    let db = null;
+    let rawRows = [];
+    let sheetHeaders = [];
+    let preparedProducts = [];
+
+    if (!isConfigured) {
+      document.getElementById("config-warning").classList.remove("hidden");
+    } else {
+      db = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+      checkSession();
+    }
+
+    async function checkSession() {
+      const { data: { session } } = await db.auth.getSession();
+      toggleAuthUI(Boolean(session));
+    }
+
+    function toggleAuthUI(isLoggedIn) {
+      document.getElementById("auth-section").classList.toggle("hidden", isLoggedIn);
+      document.getElementById("importer-section").classList.toggle("hidden", !isLoggedIn);
+      document.getElementById("logout-btn").classList.toggle("hidden", !isLoggedIn);
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      if (!db) return;
+      const errEl = document.getElementById("auth-error");
+      errEl.classList.add("hidden");
+      const email = document.getElementById("admin-email").value.trim();
+      const password = document.getElementById("admin-password").value;
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if (error) {
+        errEl.textContent = "بيانات الدخول غير صحيحة: " + error.message;
+        errEl.classList.remove("hidden");
+      } else {
+        toggleAuthUI(true);
+      }
+    }
+
+    async function handleLogout() {
+      if (db) await db.auth.signOut();
+      toggleAuthUI(false);
+    }
+
+    // تحويل الأرقام العربية وتنظيف قيم الأسعار من العملة والفواصل
+    function parseNumeric(val) {
+      if (typeof val === "number") return isFinite(val) ? val : 0;
+      const str = String(val ?? "")
+        .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
+        .replace(/,/g, "")
+        .replace(/[^\d.-]/g, "");
+      const num = parseFloat(str);
+      return isFinite(num) ? num : 0;
+    }
+
+    // توليد SKU ثابت من اسم المنتج لو الشيت لا يحتوي على عمود كود
+    function makeStableSku(name, index) {
+      const clean = String(name || "").trim().toLowerCase();
+      let hash = 0;
+      for (let i = 0; i < clean.length; i++) {
+        hash = ((hash << 5) - hash) + clean.charCodeAt(i);
+        hash |= 0;
+      }
+      return "KB-" + Math.abs(hash).toString(36).toUpperCase() + "-" + (index + 1);
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const workbook = XLSX.read(new Uint8Array(ev.target.result), { type: "array" });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        rawRows = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
+
+        if (!rawRows.length) {
+          alert("الملف فارغ أو لا يحتوي على صفوف بيانات.");
+          return;
+        }
+
+        sheetHeaders = Object.keys(rawRows[0]);
+        document.getElementById("file-info").textContent = `تمت قراءة الملف: ${file.name} (${rawRows.length} صف)`;
+        populateMappingSelects();
+        document.getElementById("mapping-card").classList.remove("hidden");
+        document.getElementById("preview-card").classList.remove("hidden");
+        rebuildPreview();
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function findBestHeader(candidates) {
+      const normalized = sheetHeaders.map(h => ({ raw: h, norm: h.trim().toLowerCase().replace(/[\s_-]+/g, "") }));
+      for (const c of candidates) {
+        const target = c.toLowerCase().replace(/[\s_-]+/g, "");
+        const exact = normalized.find(h => h.norm === target);
+        if (exact) return exact.raw;
+      }
+      for (const c of candidates) {
+        const target = c.toLowerCase().replace(/[\s_-]+/g, "");
+        const partial = normalized.find(h => h.norm.includes(target));
+        if (partial) return partial.raw;
+      }
+      return "";
+    }
+
+    function populateMappingSelects() {
+      const fields = [
+        { id: "map-name", guesses: ["Product Name", "Name", "Item", "اسم المنتج", "الاسم", "الصنف"] },
+        { id: "map-new-price", guesses: ["New Price", "new_price", "NewPrice", "السعر الجديد", "سعر البيع", "السعر", "Price"] },
+        { id: "map-sku", guesses: ["SKU", "Code", "Barcode", "ID", "الكود", "الباركود"] },
+        { id: "map-category", guesses: ["Category", "Section", "التصنيف", "القسم", "الفئة"] },
+        { id: "map-old-price", guesses: ["Old Price", "old_price", "السعر القديم", "قبل الخصم"] },
+        { id: "map-stock", guesses: ["Stock", "Qty", "Quantity", "الكمية", "المخزون", "الرصيد"] },
+        { id: "map-desc", guesses: ["Description", "Desc", "الوصف", "ملاحظات"] },
+        { id: "map-image", guesses: ["Image URL", "Image", "Photo", "الصورة", "رابط الصورة"] }
+      ];
+
+      fields.forEach(f => {
+        const sel = document.getElementById(f.id);
+        const autoMatch = findBestHeader(f.guesses);
+        sel.innerHTML = `<option value="">-- غير مستخدم --</option>` +
+          sheetHeaders.map(h => `<option value="${escapeHtml(h)}" ${h === autoMatch ? "selected" : ""}>${escapeHtml(h)}</option>`).join("");
+      });
+    }
+
+    function rebuildPreview() {
+      const map = {
+        name: document.getElementById("map-name").value,
+        newPrice: document.getElementById("map-new-price").value,
+        sku: document.getElementById("map-sku").value,
+        category: document.getElementById("map-category").value,
+        oldPrice: document.getElementById("map-old-price").value,
+        stock: document.getElementById("map-stock").value,
+        desc: document.getElementById("map-desc").value,
+        image: document.getElementById("map-image").value
+      };
+
+      const deduped = new Map();
+      let skipped = 0;
+
+      rawRows.forEach((row, idx) => {
+        const name = map.name ? String(row[map.name] ?? "").trim() : "";
+        const newPrice = map.newPrice ? parseNumeric(row[map.newPrice]) : 0;
+
+        if (!name || newPrice <= 0) {
+          skipped++;
+          return;
+        }
+
+        const rawSku = map.sku ? String(row[map.sku] ?? "").trim() : "";
+        const sku = rawSku || makeStableSku(name, idx);
+        const category = (map.category && String(row[map.category] ?? "").trim()) || "مستحضرات تجميل";
+        const oldPrice = map.oldPrice ? parseNumeric(row[map.oldPrice]) : 0;
+        const stock = map.stock && row[map.stock] !== "" ? Math.max(0, Math.round(parseNumeric(row[map.stock]))) : 10;
+        const shortDesc = map.desc ? String(row[map.desc] ?? "").trim() : "";
+        const imageUrl = map.image ? String(row[map.image] ?? "").trim() : "";
+        const isBundle = category.includes("باقة") || category.includes("باقات") || name.includes("باقة");
+
+        deduped.set(sku, {
+          sku,
+          name,
+          category,
+          old_price: oldPrice > newPrice ? oldPrice : 0,
+          new_price: newPrice,
+          stock,
+          badge: oldPrice > newPrice ? `وفر ${Math.round(oldPrice - newPrice)} ج.م` : (stock > 0 ? "متوفر الآن" : "نفد"),
+          short_desc: shortDesc || `${name} — أصلي 100% من كرامه بيوتي.`,
+          image_url: imageUrl,
+          is_bundle: isBundle,
+          tags: [category, name.split(" ")[0]].filter(Boolean),
+          updated_at: new Date().toISOString()
+        });
+      });
+
+      preparedProducts = Array.from(deduped.values());
+      document.getElementById("preview-stats").textContent =
+        `جاهز للرفع: ${preparedProducts.length} منتج صالح | تم تجاهل ${skipped} صف (بدون اسم أو سعر New Price غير صالح)`;
+
+      const tbody = document.getElementById("preview-tbody");
+      tbody.innerHTML = preparedProducts.slice(0, 25).map(p => `
+        <tr>
+          <td class="p-2.5 font-mono text-[11px] text-stone-500">${escapeHtml(p.sku)}</td>
+          <td class="p-2.5 font-bold">${escapeHtml(p.name)}</td>
+          <td class="p-2.5">${escapeHtml(p.category)}</td>
+          <td class="p-2.5 text-stone-400">${p.old_price || "-"}</td>
+          <td class="p-2.5 font-extrabold text-amber-800">${p.new_price} ج.م</td>
+          <td class="p-2.5">${p.stock}</td>
+        </tr>
+      `).join("");
+    }
+
+    async function uploadToSupabase() {
+      if (!db) return alert("يرجى ضبط ملف config.js أولاً.");
+      if (!preparedProducts.length) return alert("لا توجد منتجات صالحة للرفع. تأكد من اختيار عمود الاسم وعمود New Price.");
+
+      const btn = document.getElementById("upload-btn");
+      const wrap = document.getElementById("progress-wrap");
+      const bar = document.getElementById("progress-bar");
+      const txt = document.getElementById("progress-text");
+
+      btn.disabled = true;
+      btn.textContent = "جاري الرفع...";
+      wrap.classList.remove("hidden");
+
+      const CHUNK_SIZE = 200;
+      let uploaded = 0;
+
+      try {
+        for (let i = 0; i < preparedProducts.length; i += CHUNK_SIZE) {
+          const batch = preparedProducts.slice(i, i + CHUNK_SIZE);
+          const { error } = await db
+            .from("products")
+            .upsert(batch, { onConflict: "sku" });
+
+          if (error) throw error;
+
+          uploaded += batch.length;
+          const pct = Math.round((uploaded / preparedProducts.length) * 100);
+          bar.style.width = pct + "%";
+          txt.textContent = `تمت مزامنة ${uploaded} من ${preparedProducts.length} منتج (${pct}%)`;
+        }
+        txt.textContent = `✅ تمت مزامنة جميع المنتجات (${uploaded} منتج) بنجاح في متجر كرامه بيوتي!`;
+      } catch (err) {
+        txt.textContent = `❌ حدث خطأ أثناء الرفع: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "🚀 رفع ومزامنة مع Supabase";
+      }
+    }
+
+    function downloadTemplate() {
+      const sample = [
+        { SKU: "KB-001", "Product Name": "عطر فيلفيت عود آند فانيلا 100مل", Category: "عطور", "Old Price": 1650, "New Price": 1390, Stock: 15, Description: "ثبات عالي مناسب للمساء والمناسبات", "Image URL": "" },
+        { SKU: "KB-002", "Product Name": "سيروم هيالورونيك أسيد + B5", Category: "عناية بالبشرة", "Old Price": 520, "New Price": 440, Stock: 25, Description: "ترطيب عميق لجميع أنواع البشرة", "Image URL": "" },
+        { SKU: "KB-003", "Product Name": "باقة النضارة المتكاملة 3 قطع", Category: "باقات التوفير", "Old Price": 1450, "New Price": 1180, Stock: 8, Description: "غسول + سيروم فيتامين سي + واقي شمس", "Image URL": "" }
+      ];
+      const ws = XLSX.utils.json_to_sheet(sample);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Products");
+      XLSX.writeFile(wb, "karama-beauty-template.xlsx");
+    }
+  </script>
+</body>
+</html>
