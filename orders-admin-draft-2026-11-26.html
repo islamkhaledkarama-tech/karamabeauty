@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>طلبات المتجر | كرامه بيوتي</title>
+<script src="./config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:#faf7f2;color:#1c1917;margin:0;padding:20px}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:#78716c;font-size:13px;margin-bottom:16px}
+  .card{background:#fff;border:1px solid #e7e0d6;border-radius:14px;padding:16px;margin-bottom:14px}
+  input,select,button{font:inherit;font-size:14px;border-radius:10px;border:1px solid #d6d3d1;padding:9px 12px}
+  button{background:#1c1917;color:#fff;border-color:#1c1917;cursor:pointer}
+  button.secondary{background:#fff;color:#1c1917}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border-bottom:1px solid #f0ebe3;padding:9px 8px;text-align:right;vertical-align:top}
+  th{color:#78716c;font-weight:700}
+  .badge{display:inline-block;padding:2px 9px;border-radius:999px;background:#f5f0ea;font-size:12px;font-weight:700}
+  .muted{color:#78716c;font-size:12px}
+  .items{white-space:pre-line}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .hidden{display:none}
+  #msg{font-size:13px;margin-top:10px}
+  .err{color:#b91c1c}.ok{color:#15803d}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>طلبات المتجر — كرامه بيوتي</h1>
+  <div class="sub">الطلبات اللي اتحفظت في قاعدة البيانات من صفحة الدفع (نفس الطلبات اللي بتروح واتساب). سجّل دخول بحساب الأدمن بتاع لوحة التحكم.</div>
+
+  <div class="card" id="login-card">
+    <div class="row">
+      <input id="email" type="email" placeholder="البريد الإلكتروني" autocomplete="username">
+      <input id="password" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+      <button id="login-btn">دخول</button>
+    </div>
+    <div id="msg"></div>
+  </div>
+
+  <div class="card hidden" id="orders-card">
+    <div class="row" style="justify-content:space-between">
+      <strong id="count"></strong>
+      <span class="row">
+        <select id="filter">
+          <option value="">كل الحالات</option>
+          <option value="new">جديد</option>
+          <option value="confirmed">تم التأكيد</option>
+          <option value="shipped">تم الشحن</option>
+          <option value="delivered">تم التسليم</option>
+          <option value="cancelled">ملغي</option>
+        </select>
+        <button class="secondary" id="refresh-btn">تحديث</button>
+        <button class="secondary" id="logout-btn">خروج</button>
+      </span>
+    </div>
+    <div style="overflow-x:auto;margin-top:12px">
+      <table>
+        <thead><tr>
+          <th>التاريخ</th><th>العميل</th><th>المحافظة / العنوان</th><th>المنتجات</th>
+          <th>الدفع</th><th>الإجمالي</th><th>الحالة</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="msg2"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var cfg = window.KARAMA_CONFIG || {};
+  var msg = document.getElementById('msg'), msg2 = document.getElementById('msg2');
+  function show(el, text, ok){ el.textContent = text; el.className = ok ? 'ok' : 'err'; }
+  if(!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY){ show(msg, 'إعدادات Supabase مش موجودة في config.js', false); return; }
+  var sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  var STATUS_AR = { 'new':'جديد', 'confirmed':'تم التأكيد', 'shipped':'تم الشحن', 'delivered':'تم التسليم', 'cancelled':'ملغي' };
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function money(n){ return Number(n||0).toLocaleString('ar-EG') + ' ج.م'; }
+
+  async function loadOrders(){
+    var f = document.getElementById('filter').value;
+    var q = sb.from('orders').select('*').order('created_at', {ascending:false}).limit(200);
+    if(f) q = q.eq('status', f);
+    var res = await q;
+    if(res.error){ show(msg2, 'حصل خطأ: ' + res.error.message, false); return; }
+    var rows = res.data || [];
+    document.getElementById('count').textContent = 'عدد الطلبات: ' + rows.length;
+    var tb = document.getElementById('tbody'); tb.innerHTML = '';
+    rows.forEach(function(o){
+      var items = Array.isArray(o.items) ? o.items.map(function(it){
+        return '• ' + (it.name || it.sku || '') + ' × ' + (it.qty || 1) + ' — ' + money(it.line_total != null ? it.line_total : (it.price||0)*(it.qty||1));
+      }).join('\n') : '';
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + esc(o.created_at ? new Date(o.created_at).toLocaleString('ar-EG') : '') + '</td>' +
+        '<td>' + esc(o.customer_name) + '<div class="muted" dir="ltr">' + esc(o.customer_phone) + '</div></td>' +
+        '<td>' + esc(o.governorate) + '<div class="muted">' + esc(o.address) + '</div></td>' +
+        '<td class="items">' + esc(items) + '</td>' +
+        '<td>' + esc(o.payment_method) + '</td>' +
+        '<td>' + money(o.total) + '<div class="muted">شحن ' + money(o.shipping) + (Number(o.discount)?' · خصم ' + money(o.discount):'') + '</div></td>' +
+        '<td></td>';
+      var sel = document.createElement('select');
+      Object.keys(STATUS_AR).forEach(function(k){
+        var opt = document.createElement('option'); opt.value = k; opt.textContent = STATUS_AR[k];
+        if((o.status || 'new') === k) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener('change', async function(){
+        var up = await sb.from('orders').update({status: sel.value}).eq('id', o.id);
+        if(up.error){ show(msg2, 'ما اتحفظتش الحالة: ' + up.error.message, false); }
+        else { show(msg2, 'اتحفظت حالة الطلب ✅', true); }
+      });
+      tr.lastChild.appendChild(sel);
+      tb.appendChild(tr);
+    });
+    if(!rows.length) tb.innerHTML = '<tr><td colspan="7" class="muted">مافيش طلبات لسه.</td></tr>';
+  }
+
+  document.getElementById('login-btn').addEventListener('click', async function(){
+    var email = document.getElementById('email').value.trim();
+    var password = document.getElementById('password').value;
+    var res = await sb.auth.signInWithPassword({email: email, password: password});
+    if(res.error){ show(msg, 'بيانات الدخول غير صحيحة: ' + res.error.message, false); return; }
+    document.getElementById('login-card').classList.add('hidden');
+    document.getElementById('orders-card').classList.remove('hidden');
+    loadOrders();
+  });
+  document.getElementById('refresh-btn').addEventListener('click', loadOrders);
+  document.getElementById('filter').addEventListener('change', loadOrders);
+  document.getElementById('logout-btn').addEventListener('click', async function(){
+    await sb.auth.signOut(); location.reload();
+  });
+  sb.auth.getSession().then(function(r){
+    if(r.data && r.data.session){
+      document.getElementById('login-card').classList.add('hidden');
+      document.getElementById('orders-card').classList.remove('hidden');
+      loadOrders();
+    }
+  });
+})();
+</script>
+</body>
+</html>
