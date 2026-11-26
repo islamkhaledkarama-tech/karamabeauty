@@ -110,6 +110,55 @@
     });
   }
 
+  // Save each checkout order to Supabase (public.orders) before WhatsApp opens.
+  // Fire-and-forget: a failed insert never blocks the WhatsApp order.
+  var _submitWhatsAppOrder = window.submitWhatsAppOrder;
+  if (typeof _submitWhatsAppOrder === "function") {
+    window.submitWhatsAppOrder = function (e) {
+      try {
+        if (cart && cart.length) {
+          var govParts = document.getElementById("cust-gov").value.split("|");
+          var payment = document.querySelector('input[name="payment"]:checked').value;
+          var subtotal = 0;
+          var items = cart.map(function (entry) {
+            var p = PRODUCTS.find(function (x) { return x.id === entry.id; });
+            var price = p ? p.newPrice : 0;
+            subtotal += price * entry.qty;
+            return { sku: entry.id, name: p ? p.name : entry.id, qty: entry.qty, price: price, line_total: price * entry.qty };
+          });
+          var rate = (typeof PREPAID_DISCOUNT_RATE !== "undefined") ? PREPAID_DISCOUNT_RATE : 0.05;
+          var threshold = (typeof FREE_SHIPPING_THRESHOLD !== "undefined") ? FREE_SHIPPING_THRESHOLD : 1000;
+          var discount = payment === "prepaid" ? Math.round(subtotal * rate) : 0;
+          var shipping = subtotal >= threshold ? 0 : Number(govParts[1]);
+          var order = {
+            customer_name: document.getElementById("cust-name").value.trim(),
+            customer_phone: document.getElementById("cust-phone").value.trim(),
+            governorate: govParts[0],
+            address: document.getElementById("cust-address").value.trim(),
+            payment_method: payment === "prepaid" ? "إنستاباي / محفظة إلكترونية" : "الدفع عند الاستلام",
+            items: items,
+            subtotal: subtotal,
+            discount: discount,
+            shipping: shipping,
+            total: subtotal - discount + shipping
+          };
+          fetch(cfg.SUPABASE_URL + "/rest/v1/orders", {
+            method: "POST",
+            keepalive: true,
+            headers: {
+              apikey: cfg.SUPABASE_ANON_KEY,
+              Authorization: "Bearer " + cfg.SUPABASE_ANON_KEY,
+              "Content-Type": "application/json",
+              Prefer: "return=minimal"
+            },
+            body: JSON.stringify(order)
+          }).catch(function () {});
+        }
+      } catch (err) { /* never block checkout */ }
+      return _submitWhatsAppOrder(e);
+    };
+  }
+
   // Keep the original sample product: the cart upsell references it by id
   var sampleProduct = PRODUCTS.find(function (p) { return p.id === "sample-10ml"; });
 
