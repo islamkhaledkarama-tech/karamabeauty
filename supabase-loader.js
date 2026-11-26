@@ -68,21 +68,32 @@
       + '</div></div></div></article>';
   };
 
-  // Product modal: swap the illustration for the real photo after it opens
+  // Product modal: swap the illustration for the real photo after it opens,
+  // and append the full Arabic description when available
   var _openProductModal = window.openProductModal;
   window.openProductModal = function (id) {
     _openProductModal(id);
     var p = PRODUCTS.find(function (x) { return x.id === id; });
-    if (!p || !p.imageUrl) return;
+    if (!p) return;
     var body = document.getElementById("product-modal-body");
     if (!body) return;
-    var svg = body.querySelector("svg");
-    if (!svg) return;
-    var img = document.createElement("img");
-    img.src = p.imageUrl;
-    img.alt = "";
-    img.style.cssText = "width:100%;max-height:240px;object-fit:cover;border-radius:12px;";
-    svg.replaceWith(img);
+    if (p.imageUrl) {
+      var svg = body.querySelector("svg");
+      if (svg) {
+        var img = document.createElement("img");
+        img.src = p.imageUrl;
+        img.alt = "";
+        img.style.cssText = "width:100%;max-height:240px;object-fit:cover;border-radius:12px;";
+        svg.replaceWith(img);
+      }
+    }
+    var desc = p.details && p.details.description_ar;
+    if (desc) {
+      var d = document.createElement("div");
+      d.style.cssText = "margin-top:14px;font-size:13px;line-height:1.9;color:#44403c;white-space:pre-line;border-top:1px solid #f5f0ea;padding-top:12px;";
+      d.textContent = desc;
+      body.appendChild(d);
+    }
   };
 
   function fetchPage(offset) {
