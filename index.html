@@ -36,15 +36,27 @@
     body { background-color: #FAF7F2; color: #1C1917; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    /* ===== Karama Beauty: تصميم مبيعات ===== */
+    .karama-promo-bar { background: #4a112f; color: #c9a24b; }
+    .karama-promo-bar strong { color: #ffffff; }
+    .karama-hero-cta { background: #4a112f; color: #ffffff; box-shadow: 0 10px 24px rgba(74, 17, 47, 0.28); }
+    .karama-hero-cta:hover { background: #5d173c; }
+    .karama-trust-badge { background: #ffffff; border: 1px solid rgba(201, 162, 75, 0.5); border-radius: 16px; padding: 14px 10px; text-align: center; font-weight: 700; font-size: 14px; color: #4a112f; box-shadow: 0 2px 10px rgba(28, 25, 23, 0.05); }
+    .karama-benefit-card { background: #ffffff; border: 1px solid rgba(201, 162, 75, 0.5); border-top: 4px solid #c9a24b; border-radius: 18px; padding: 22px 18px; box-shadow: 0 4px 16px rgba(28, 25, 23, 0.06); }
+    .karama-footer { background: #4a112f; }
+    .karama-whatsapp-float { position: fixed; bottom: 16px; left: 16px; z-index: 40; display: inline-flex; align-items: center; gap: 8px; background: #25D366; color: #ffffff; font-weight: 800; font-size: 15px; padding: 12px 18px; border-radius: 999px; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28); text-decoration: none; }
+    .karama-whatsapp-float:hover { background: #1eb856; }
+    #products-grid article, #bundles-grid article { border-radius: 18px; box-shadow: 0 2px 10px rgba(28, 25, 23, 0.06); transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    #products-grid article:hover, #bundles-grid article:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(74, 17, 47, 0.16); }
   </style>
 </head>
 <body class="font-sans antialiased selection:bg-brand-gold selection:text-white">
 
   <!-- شريط التنبيهات العلوي -->
-  <div class="bg-brand-ink text-brand-ivory text-xs sm:text-sm py-2 px-4 text-center">
-    <span>شحن مجاني للطلبات فوق <strong>1,000 ج.م</strong></span>
-    <span class="mx-2 text-brand-gold">•</span>
-    <span>خصم إضافي <strong>5%</strong> عند الدفع عبر إنستاباي أو المحافظ الإلكترونية</span>
+  <div class="karama-promo-bar text-xs sm:text-sm py-2 px-4 text-center font-semibold">
+    <span>شحن مجاني للطلبات فوق <strong>1000 ج.م</strong> 🚚</span>
+    <span class="mx-2">|</span>
+    <span>خصم <strong>5%</strong> عند الدفع المسبق</span>
   </div>
 
   <!-- الهيدر -->
@@ -88,12 +100,13 @@
           أصلي 100% • فحص الكود التسلسلي (Batch Code)
         </span>
         <h2 class="text-3xl sm:text-4xl font-extrabold leading-snug mb-4">
-          روتينك المتكامل وعطرك المميز… <span class="text-brand-gold">بثقة كاملة</span>
+          جمالك يبدأ من <span class="text-brand-gold">كرامه بيوتي</span>
         </h2>
         <p class="text-brand-muted text-sm sm:text-base leading-relaxed mb-6">
-          لا تحتاري في الاختيار أونلاين؛ جربي مستشار البشرة والعطور الذكي ليقترح لكِ الأنسب حسب نوع بشرتك وميزانيتك، أو اطلبي مجموعة العينات قبل شراء الزجاجة الكاملة.
+          مستحضرات تجميل وعطور أصلية 100% — توصيل لجميع المحافظات والدفع عند الاستلام
         </p>
         <div class="flex flex-wrap gap-3">
+          <a href="#products-grid" class="karama-hero-cta font-bold px-6 py-3 rounded-xl text-sm transition">تسوقي الآن</a>
           <button onclick="openAdvisorModal()" class="bg-brand-gold hover:bg-brand-goldDark text-white font-bold px-6 py-3 rounded-xl text-sm shadow-sm transition">
             ✨ اختاري منتجك بالمستشار الذكي
           </button>
@@ -126,6 +139,16 @@
           <p class="text-xs text-brand-muted">تأكيد فوري للطلب واستشارة مجانية لطريقة الاستخدام.</p>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- شارات الثقة -->
+  <section class="max-w-6xl mx-auto px-4 pt-6">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="karama-trust-badge">منتجات أصلية 100% ✅</div>
+      <div class="karama-trust-badge">الدفع عند الاستلام 💵</div>
+      <div class="karama-trust-badge">توصيل سريع 🚚</div>
+      <a href="https://wa.me/201064199914" target="_blank" rel="noopener" class="karama-trust-badge block">دعم عبر واتساب 💬</a>
     </div>
   </section>
 
@@ -168,10 +191,38 @@
   </section>
 
   <!-- الفوتر -->
-  <footer class="bg-brand-ink text-stone-300 mt-12 py-10 px-4">
+  <!-- ليه تختار كرامه بيوتي -->
+  <section class="max-w-6xl mx-auto px-4 pt-12 pb-4">
+    <h3 class="text-2xl sm:text-3xl font-extrabold text-center mb-2" style="color:#4a112f;">ليه تختار كرامه بيوتي؟</h3>
+    <p class="text-center text-sm text-stone-600 mb-8">تجربة تسوق موثوقة لمنتجات التجميل والعطور الأصلية</p>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="karama-benefit-card text-center">
+        <div class="text-3xl mb-2">✅</div>
+        <h4 class="font-extrabold text-base mb-2" style="color:#4a112f;">منتجات أصلية مضمونة</h4>
+        <p class="text-sm text-stone-600 leading-relaxed">منتجات أصلية 100% من مصادر موثوقة، مع ضمان الأصالة على كل منتج.</p>
+      </div>
+      <div class="karama-benefit-card text-center">
+        <div class="text-3xl mb-2">🏷️</div>
+        <h4 class="font-extrabold text-base mb-2" style="color:#4a112f;">أسعار منافسة وعروض مستمرة</h4>
+        <p class="text-sm text-stone-600 leading-relaxed">أسعار منافسة وعروض مستمرة، وشحن مجاني للطلبات فوق 1000 ج.م.</p>
+      </div>
+      <div class="karama-benefit-card text-center">
+        <div class="text-3xl mb-2">💬</div>
+        <h4 class="font-extrabold text-base mb-2" style="color:#4a112f;">خدمة عملاء سريعة على واتساب</h4>
+        <p class="text-sm text-stone-600 leading-relaxed">مساعدة سريعة في اختيار المنتج المناسب ومتابعة طلبك عبر <a href="https://wa.me/201064199914" target="_blank" rel="noopener" class="font-bold underline" style="color:#4a112f;">واتساب</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="karama-footer text-stone-300 mt-12 py-10 px-4">
     <div class="max-w-6xl mx-auto grid sm:grid-cols-3 gap-6 text-sm">
       <div>
         <h4 class="text-white font-extrabold text-base mb-2">كرامه بيوتي</h4>
+      <nav class="flex flex-wrap gap-x-4 gap-y-1 mb-3 text-xs font-bold">
+        <a href="#" class="hover:text-white">الرئيسية</a>
+        <a href="#bundles" class="hover:text-white">باقات الروتين</a>
+        <a href="#catalog" class="hover:text-white">المنتجات</a>
+      </nav>
         <p class="text-xs text-stone-400 leading-relaxed">
           متجرك الموثوق لمستحضرات العناية بالبشرة والمكياج والعطور الأصلية في مصر، مع استشارات ذكية وتوصيل سريع حتى باب المنزل.
         </p>
@@ -187,6 +238,7 @@
       <div>
         <h4 class="text-white font-bold mb-2">تواصل سريع</h4>
         <p class="text-xs text-stone-400 mb-3">تحتاج مساعدة في اختيار روتين بشرتك أو هدية عطرية؟</p>
+        <a href="https://wa.me/201064199914" target="_blank" rel="noopener" class="block text-xs font-bold mb-3" style="color:#c9a24b;">واتساب: 01064199914</a>
         <button onclick="openDirectWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition">
           تحدث معنا عبر واتساب
         </button>
@@ -879,5 +931,6 @@
   <script src="supabase-loader.js"></script>
 <script src="/pwa-register.js"></script>
 <button id="pwa-install-btn" onclick="karamaInstallApp()" style="display:none;position:fixed;bottom:16px;inset-inline-start:16px;z-index:9999;background:#4a112f;color:#f5c86b;border:1px solid #f5c86b;border-radius:999px;padding:12px 20px;font-size:16px;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.3);cursor:pointer">📲 ثبّت التطبيق</button>
+  <a href="https://wa.me/201064199914" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب" class="karama-whatsapp-float">💬 واتساب</a>
 </body>
 </html>
