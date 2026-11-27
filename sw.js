@@ -1,5 +1,5 @@
 /* Karama Beauty PWA service worker — network-first for pages, cache-first for static assets */
-const CACHE = 'karama-beauty-v6';
+const CACHE = 'karama-beauty-v7';
 const CORE = ['/', '/index.html', '/manifest.json', '/icon-192.png', '/icon-512.png', '/config.js', '/supabase-loader.js'];
 
 self.addEventListener('install', (e) => {
