@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة التحكم | كرامه بيوتي</title>
+<script src="./config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--burgundy:#4a112f;--gold:#c9a24b;--gold-light:#e8c87a;--bg:#faf7f2;--ink:#1c1917;--muted:#78716c;--line:#e7e0d6}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0}
+  header{background:linear-gradient(135deg,var(--burgundy),#6d1a45);color:#fff;padding:22px 20px}
+  header .wrap{max-width:1150px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:22px;margin:0}
+  header h1 span{color:var(--gold-light)}
+  header .sub{font-size:13px;opacity:.85;margin-top:4px}
+  main{max-width:1150px;margin:0 auto;padding:20px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+  input,button{font:inherit;font-size:14px;border-radius:10px;border:1px solid #d6d3d1;padding:9px 12px}
+  button{background:var(--burgundy);color:#fff;border-color:var(--burgundy);cursor:pointer}
+  button.secondary{background:#fff;color:var(--ink)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .hidden{display:none}
+  #msg{font-size:13px;margin-top:10px}
+  .err{color:#b91c1c}.ok{color:#15803d}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
+  .kpi .num{font-size:26px;font-weight:800;color:var(--burgundy)}
+  .kpi .lbl{font-size:13px;color:var(--muted);margin-top:4px}
+  .kpi.gold .num{color:var(--gold)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  h2{font-size:16px;margin:0 0 12px;color:var(--burgundy)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border-bottom:1px solid #f0ebe3;padding:8px;text-align:right;vertical-align:top}
+  th{color:var(--muted)}
+  .badge{display:inline-block;padding:2px 9px;border-radius:999px;background:#f5f0ea;font-size:12px;font-weight:700}
+  .badge.new{background:#fef3c7}.badge.confirmed{background:#dbeafe}.badge.shipped{background:#ede9fe}.badge.delivered{background:#dcfce7}.badge.cancelled{background:#fee2e2}
+  .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px}
+  .bar-row .name{width:150px;flex-shrink:0}
+  .bar-track{flex:1;background:#f5f0ea;border-radius:999px;height:14px;overflow:hidden}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:999px}
+  .bar-row .val{width:40px;text-align:left;font-weight:700}
+  .links{display:flex;gap:10px;flex-wrap:wrap}
+  .links a{flex:1;min-width:150px;text-align:center;background:var(--burgundy);color:#fff;text-decoration:none;padding:14px;border-radius:12px;font-weight:700;font-size:14px}
+  .links a.gold{background:var(--gold);color:#2a1a05}
+  .muted{color:var(--muted);font-size:12px}
+  .empty{color:var(--muted);font-size:13px;text-align:center;padding:14px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div>
+      <h1>لوحة تحكم <span>كرامه بيوتي</span></h1>
+      <div class="sub">نظرة شاملة على متجرك: المنتجات، المخزون، والطلبات</div>
+    </div>
+    <div class="row hidden" id="head-actions">
+      <button class="secondary" id="refresh-btn">تحديث</button>
+      <button class="secondary" id="logout-btn">خروج</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="card" id="login-card">
+    <h2>تسجيل الدخول</h2>
+    <div class="muted" style="margin-bottom:10px">سجّل دخول بحساب الأدمن بتاع المتجر (نفس حساب لوحة التحكم).</div>
+    <div class="row">
+      <input id="email" type="email" placeholder="البريد الإلكتروني" autocomplete="username">
+      <input id="password" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+      <button id="login-btn">دخول</button>
+    </div>
+    <div id="msg"></div>
+  </div>
+
+  <div id="dash" class="hidden">
+    <div class="kpis">
+      <div class="kpi"><div class="num" id="k-products">—</div><div class="lbl">إجمالي المنتجات</div></div>
+      <div class="kpi"><div class="num" id="k-instock">—</div><div class="lbl">منتجات متوفرة</div></div>
+      <div class="kpi gold"><div class="num" id="k-orders">—</div><div class="lbl">إجمالي الطلبات</div></div>
+      <div class="kpi gold"><div class="num" id="k-new">—</div><div class="lbl">طلبات جديدة</div></div>
+      <div class="kpi"><div class="num" id="k-revenue">—</div><div class="lbl">إجمالي المبيعات (ج.م)</div></div>
+      <div class="kpi"><div class="num" id="k-lowstock">—</div><div class="lbl">مخزون منخفض (≤3)</div></div>
+    </div>
+
+    <div class="card">
+      <h2>روابط سريعة</h2>
+      <div class="links">
+        <a href="/admin">إدارة المنتجات</a>
+        <a href="/orders" class="gold">الطلبات</a>
+        <a href="/">واجهة المتجر</a>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>المنتجات حسب الفئة</h2>
+        <div id="cats"></div>
+      </div>
+      <div class="card">
+        <h2>أحدث الطلبات</h2>
+        <div style="overflow-x:auto"><table>
+          <thead><tr><th>العميل</th><th>المحافظة</th><th>الإجمالي</th><th>الحالة</th></tr></thead>
+          <tbody id="recent-orders"></tbody>
+        </table></div>
+        <div class="empty hidden" id="no-orders">مافيش طلبات لسه.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>منتجات مخزونها منخفض</h2>
+      <div style="overflow-x:auto"><table>
+        <thead><tr><th>المنتج</th><th>الفئة</th><th>المخزون</th><th>السعر</th></tr></thead>
+        <tbody id="lowstock"></tbody>
+      </table></div>
+      <div class="empty hidden" id="no-lowstock">كل المنتجات مخزونها كويس.</div>
+    </div>
+  </div>
+</main>
+
+<script>
+const cfg = window.KARAMA_CONFIG || {};
+const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+const $ = id => document.getElementById(id);
+const statusAr = {new:'جديد',confirmed:'تم التأكيد',shipped:'تم الشحن',delivered:'تم التسليم',cancelled:'ملغي'};
+
+function showMsg(t, cls){ const m=$('msg'); m.textContent=t; m.className=cls||''; }
+
+async function loadData(){
+  showMsg('جاري التحميل...','');
+  const [prodRes, ordRes] = await Promise.all([
+    sb.from('products').select('sku,name,category,new_price,stock').limit(5000),
+    sb.from('orders').select('*').order('created_at',{ascending:false}).limit(500)
+  ]);
+  if(prodRes.error){ showMsg('خطأ في تحميل المنتجات: '+prodRes.error.message,'err'); return; }
+  if(ordRes.error){ showMsg('خطأ في تحميل الطلبات: '+ordRes.error.message,'err'); return; }
+  const products = prodRes.data || [], orders = ordRes.data || [];
+
+  $('k-products').textContent = products.length.toLocaleString('ar-EG');
+  $('k-instock').textContent = products.filter(p=>p.stock>0).length.toLocaleString('ar-EG');
+  $('k-orders').textContent = orders.length.toLocaleString('ar-EG');
+  $('k-new').textContent = orders.filter(o=>o.status==='new').length.toLocaleString('ar-EG');
+  const revenue = orders.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+Number(o.total||0),0);
+  $('k-revenue').textContent = revenue.toLocaleString('ar-EG');
+  const low = products.filter(p=>p.stock<=3);
+  $('k-lowstock').textContent = low.length.toLocaleString('ar-EG');
+
+  const byCat = {};
+  products.forEach(p=>{ const c=p.category||'أخرى'; byCat[c]=(byCat[c]||0)+1; });
+  const cats = Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  const max = cats.length? cats[0][1] : 1;
+  $('cats').innerHTML = cats.map(([c,n])=>
+    `<div class="bar-row"><span class="name">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${Math.round(n/max*100)}%"></div></div><span class="val">${n}</span></div>`
+  ).join('');
+
+  const recent = orders.slice(0,8);
+  $('no-orders').classList.toggle('hidden', recent.length>0);
+  $('recent-orders').innerHTML = recent.map(o=>
+    `<tr><td>${o.customer_name||'—'}</td><td>${o.governorate||'—'}</td><td>${Number(o.total||0).toLocaleString('ar-EG')} ج.م</td><td><span class="badge ${o.status}">${statusAr[o.status]||o.status}</span></td></tr>`
+  ).join('');
+
+  $('no-lowstock').classList.toggle('hidden', low.length>0);
+  $('lowstock').innerHTML = low.slice(0,20).map(p=>
+    `<tr><td>${p.name}</td><td>${p.category||'—'}</td><td>${p.stock}</td><td>${Number(p.new_price||0).toLocaleString('ar-EG')} ج.م</td></tr>`
+  ).join('');
+
+  showMsg('آخر تحديث: '+new Date().toLocaleTimeString('ar-EG'),'ok');
+}
+
+async function enterDash(){
+  $('login-card').classList.add('hidden');
+  $('dash').classList.remove('hidden');
+  $('head-actions').classList.remove('hidden');
+  await loadData();
+}
+
+$('login-btn').addEventListener('click', async ()=>{
+  const email=$('email').value.trim(), password=$('password').value;
+  if(!email||!password){ showMsg('دخل الإيميل وكلمة المرور.','err'); return; }
+  showMsg('جاري تسجيل الدخول...','');
+  const {error} = await sb.auth.signInWithPassword({email,password});
+  if(error){ showMsg('فشل تسجيل الدخول: '+error.message,'err'); return; }
+  await enterDash();
+});
+$('refresh-btn').addEventListener('click', loadData);
+$('logout-btn').addEventListener('click', async ()=>{ await sb.auth.signOut(); location.reload(); });
+
+sb.auth.getSession().then(({data})=>{ if(data.session) enterDash(); });
+</script>
+</body>
+</html>
