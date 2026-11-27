@@ -61,7 +61,7 @@
       <table>
         <thead><tr>
           <th>التاريخ</th><th>العميل</th><th>المحافظة / العنوان</th><th>المنتجات</th>
-          <th>الدفع</th><th>الإجمالي</th><th>الحالة</th>
+          <th>الدفع</th><th>الإجمالي</th><th>الحالة</th><th>شحنة Bosta</th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -102,7 +102,7 @@
         '<td class="items">' + esc(items) + '</td>' +
         '<td>' + esc(o.payment_method) + '</td>' +
         '<td>' + money(o.total) + '<div class="muted">شحن ' + money(o.shipping) + (Number(o.discount)?' · خصم ' + money(o.discount):'') + '</div></td>' +
-        '<td></td>';
+        '<td></td><td></td>';
       var sel = document.createElement('select');
       Object.keys(STATUS_AR).forEach(function(k){
         var opt = document.createElement('option'); opt.value = k; opt.textContent = STATUS_AR[k];
@@ -114,10 +114,30 @@
         if(up.error){ show(msg2, 'ما اتحفظتش الحالة: ' + up.error.message, false); }
         else { show(msg2, 'اتحفظت حالة الطلب ✅', true); }
       });
-      tr.lastChild.appendChild(sel);
+      tr.children[6].appendChild(sel);
+      var shipCell = tr.children[7];
+      if(o.tracking_number){
+        shipCell.innerHTML = '<span class="badge">رقم التتبع: ' + esc(o.tracking_number) + '</span>' +
+          '<div><a href="https://bosta.co/tracking-shipments?track=' + encodeURIComponent(o.tracking_number) + '" target="_blank" rel="noopener">تتبع الشحنة</a></div>';
+      } else {
+        var bBtn = document.createElement('button');
+        bBtn.textContent = 'إنشاء شحنة Bosta';
+        bBtn.addEventListener('click', async function(){
+          bBtn.disabled = true; bBtn.textContent = 'جاري الإنشاء...';
+          var r = await sb.functions.invoke('bosta-create-shipment', { body: { order_id: o.id } });
+          if(r.error || (r.data && r.data.error)){
+            show(msg2, 'ما اتعملتش الشحنة: ' + ((r.data && r.data.error) || r.error.message), false);
+            bBtn.disabled = false; bBtn.textContent = 'إنشاء شحنة Bosta';
+          } else {
+            show(msg2, 'اتعملت الشحنة ✅ رقم التتبع: ' + r.data.tracking_number, true);
+            loadOrders();
+          }
+        });
+        shipCell.appendChild(bBtn);
+      }
       tb.appendChild(tr);
     });
-    if(!rows.length) tb.innerHTML = '<tr><td colspan="7" class="muted">مافيش طلبات لسه.</td></tr>';
+    if(!rows.length) tb.innerHTML = '<tr><td colspan="8" class="muted">مافيش طلبات لسه.</td></tr>';
   }
 
   document.getElementById('login-btn').addEventListener('click', async function(){
