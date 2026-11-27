@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.karamabeauty.app",
+        "sha256_cert_fingerprints": ["99:A9:DE:3A:34:CA:44:3A:55:76:83:C3:AA:5D:A6:BF:50:64:62:01:F9:F0:4A:C5:AC:B1:D2:D2:7B:7B:6A:AB"]
+      }
+    }]
